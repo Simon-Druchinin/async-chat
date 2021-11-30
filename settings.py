@@ -2,4 +2,4 @@ from socket import gethostname
 
 
 IP_SERVER = gethostname()
-PORT_SERVER = 2929
+PORT_SERVER = 9520

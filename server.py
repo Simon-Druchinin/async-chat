@@ -20,9 +20,13 @@ class Server(Socket):
 
     async def listen_socket(self, listened_socket: object = None) -> None:
         while True:
-            data = await self.main_loop.sock_recv(listened_socket, 2048)
-            print(f"User sent {data}")
-            await self.send_data(data.encode('utf-8'))
+            try:
+                data = await self.main_loop.sock_recv(listened_socket, 2048)                
+                await self.send_data(data)
+            except ConnectionResetError:
+                self.clients.remove(listened_socket)
+                print("Client is gone ...")
+                return
 
     async def accept_sockets(self) -> None:
         while True:
@@ -39,5 +43,5 @@ class Server(Socket):
 if __name__ == "__main__":
     server = Server()
     server.set_up(IP_SERVER, PORT_SERVER)
-    
+
     server.start()

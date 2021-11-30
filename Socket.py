@@ -7,10 +7,10 @@ class Socket():
         self.socket = socket(AF_INET, SOCK_STREAM)
         self.main_loop = asyncio.get_event_loop()
     
-    async def send_data(self):
+    async def send_data(self, data=None):
         raise NotImplementedError()
 
-    async def listen_socket(self):
+    async def listen_socket(self, listened_socket=None):
         raise NotImplementedError()
     
     async def main(self): 
