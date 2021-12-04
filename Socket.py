@@ -5,7 +5,7 @@ from socket import socket, AF_INET, SOCK_STREAM
 class Socket():
     def __init__(self):
         self.socket = socket(AF_INET, SOCK_STREAM)
-        self.main_loop = asyncio.get_event_loop()
+        self.main_loop = asyncio.new_event_loop()
     
     async def send_data(self, data=None):
         raise NotImplementedError()

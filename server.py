@@ -1,7 +1,9 @@
+import os
 import asyncio
+from datetime import datetime
 from Socket import Socket
 
-from settings import IP_SERVER, PORT_SERVER
+from settings import IP_SERVER, PORT_SERVER, TXT_LOGS_PATH
 
 
 class Server(Socket):
@@ -9,11 +11,23 @@ class Server(Socket):
         super(Server, self).__init__()
         self.clients = []
     
-    def set_up(self, ip: str, port: int) -> None:
+    def set_up(self, ip: str, port: int, listen_amount:int=5) -> None:
         self.socket.bind((ip, port))
-        self.socket.listen()
+        self.socket.listen(listen_amount)
 
         self.socket.setblocking(False)
+    
+    def _write_logs_to_txt(self, message):
+        if os.stat(TXT_LOGS_PATH).st_size:
+            with open(TXT_LOGS_PATH, 'r', encoding="utf-8") as read_file:
+                lines = read_file.readlines()
+            lines += f"[{datetime.now().date()}]: {message}\n"
+        else:
+            lines = f"[{datetime.now().date()}]: {message}\n"
+
+        with open(TXT_LOGS_PATH, 'w', encoding="utf-8") as read_file:
+            for line in lines:
+                read_file.write(line)
     
     async def send_data(self, data: str) -> None:
         for client in self.clients: await self.main_loop.sock_sendall(client, data)
@@ -25,7 +39,6 @@ class Server(Socket):
                 await self.send_data(data)
             except ConnectionResetError:
                 self.clients.remove(listened_socket)
-                print("Client is gone ...")
                 return
 
     async def accept_sockets(self) -> None:
@@ -33,7 +46,8 @@ class Server(Socket):
             client_socket, address = await self.main_loop.sock_accept(self.socket)
             self.clients.append(client_socket)
 
-            print(f"{address[1]} connected")
+            message = f"{address[1]} connected"
+            self._write_logs_to_txt(message)
 
             self.main_loop.create_task(self.listen_socket(client_socket))
 
