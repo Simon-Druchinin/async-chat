@@ -30,13 +30,12 @@ class Room():
 
     @staticmethod
     def get_rooms_list() -> list:
-        rooms_list = []
 
         if os.stat(JSON_ROOM_PATH).st_size:
             with open(JSON_ROOM_PATH, "r", encoding="utf-8") as read_file:
-                rooms_list = json.load(read_file)
+                return json.load(read_file)
             
-        return rooms_list
+        return []
 
     def __init__(self, port_server: str, password: str|None):
         self.port_server: int = int(port_server)
